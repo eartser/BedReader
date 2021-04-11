@@ -1,5 +1,4 @@
 import java.nio.file.Path
-import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.toSortedSet
 
@@ -21,11 +20,11 @@ interface BedIndex {
      * Initializes [indices] and [bedIndex] with values from [entries]
      */
     fun init(entries: List<BedEntry>) {
-        entries.forEachIndexed { ind, it -> indices[Triple(it.chromosome, it.start, it.end)] = ind }
+        entries.forEachIndexed { ind, it -> indices.put(Triple(it.chromosome, it.start, it.end), ind) }
         entries.groupBy { it.chromosome }.map { (k, it) ->
             bedIndex[k] = SegmentTree(it.groupBy { e -> e.start }.mapValues { (_, list) ->
                 list.map { it.end }.toSortedSet()
-            })
+            }.toSortedMap())
         }
     }
 
@@ -46,6 +45,13 @@ interface BedIndex {
 }
 
 interface BedReader {
+
+    fun emptyIndex(): BedIndex = object : BedIndex {
+        override val bedIndex: HashMap<String, SegmentTree>
+            get() = hashMapOf()
+        override val indices: HashMap<Triple<String, Int, Int>, Int>
+            get() = hashMapOf()
+    }
 
     /**
      * Converts [line] to [BedEntry] instance
@@ -72,12 +78,7 @@ interface BedReader {
      * Creates index for [bedPath] and saves it to [indexPath]
      */
     fun createIndex(bedPath: Path, indexPath: Path) {
-        val index = object : BedIndex {
-            override val bedIndex: HashMap<String, SegmentTree>
-                get() = emptyMap<String, SegmentTree>() as HashMap<String, SegmentTree>
-            override val indices: HashMap<Triple<String, Int, Int>, Int>
-                get() = emptyMap<Triple<String, Int, Int>, Int>() as HashMap<Triple<String, Int, Int>, Int>
-        }
+        val index = emptyIndex()
         index.init(getEntries(bedPath))
         indexPath.toFile().writeText(index.write())
     }
@@ -86,12 +87,7 @@ interface BedReader {
      * Loads [BedIndex] instance from file [indexPath]
      */
     fun loadIndex(indexPath: Path): BedIndex {
-        val index = object : BedIndex {
-            override val bedIndex: HashMap<String, SegmentTree>
-                get() = emptyMap<String, SegmentTree>() as HashMap<String, SegmentTree>
-            override val indices: HashMap<Triple<String, Int, Int>, Int>
-                get() = emptyMap<Triple<String, Int, Int>, Int>() as HashMap<Triple<String, Int, Int>, Int>
-        }
+        val index = emptyIndex()
         index.read(indexPath.toFile().readLines())
         return index
     }

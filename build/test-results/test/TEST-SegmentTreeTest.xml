@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SegmentTreeTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-04-11T20:37:43" hostname="MSI" time="0.014">
+  <properties/>
+  <testcase name="simple request()" classname="SegmentTreeTest" time="0.01"/>
+  <testcase name="all segments()" classname="SegmentTreeTest" time="0.001"/>
+  <testcase name="invalid request()" classname="SegmentTreeTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
