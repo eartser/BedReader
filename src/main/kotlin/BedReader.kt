@@ -20,8 +20,10 @@ interface BedIndex {
      * Initializes [indices] and [bedIndex] with values from [entries]
      */
     fun init(entries: List<BedEntry>) {
-        entries.forEachIndexed { ind, it -> indices.put(Triple(it.chromosome, it.start, it.end), ind) }
-        entries.groupBy { it.chromosome }.map { (k, it) ->
+        entries.forEachIndexed { ind, it ->
+            indices[Triple(it.chromosome, it.start, it.end)] = ind
+        }
+        entries.groupBy { it.chromosome }.forEach { (k, it) ->
             bedIndex[k] = SegmentTree(it.groupBy { e -> e.start }.mapValues { (_, list) ->
                 list.map { it.end }.toSortedSet()
             }.toSortedMap())
